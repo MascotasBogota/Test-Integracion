@@ -26,7 +26,7 @@ def register_user(full_name, email, password):
             if response.status_code == 409:
                 print(f"[INFO] Usuario {email} ya estaba registrado.")
                 return True
-            print(f"[ERROR] Error registrando a {email}: {response.status_code} -> {response.text}")
+            print(f"[ERROR] Error registrando a {email}: {response.status_code} -> Usuario ya registrado")
             return False
     except requests.exceptions.RequestException as e:
         print(f"[ERROR] Error de conexión al registrar a {email}: {e}")
@@ -47,7 +47,7 @@ def login_user(email, password):
             token = data.get('token')
             print(f"[OK] Login exitoso para {email}")
             if token:
-                print(f"      Token (inicio): {token}")
+                print(f"      Token (inicio): {token[:10]}...")
                 return token
             else:
                 print("      (No se recibió token)")
@@ -67,7 +67,7 @@ def create_report(token, report_data):
         response = requests.post(f"{BASE_URL_2}/reports/", json=report_data, headers=headers)
         if response.status_code == 201:
             report_id = response.json().get("_id")
-            print(f"[OK] Reporte creado exitosamente con ID: {report_id}")
+            print(f"[OK] Reporte creado exitosamente con ID: {report_id[:10]}...")
             return report_id
         else:
             print(f"[ERROR] Error al crear el reporte: {response.status_code} -> {response.text}")
@@ -83,7 +83,7 @@ def create_response(token, report_id, response_data):
         response = requests.post(f"{BASE_URL_2}/responses/{report_id}", json=response_data, headers=headers)
         if response.status_code == 201:
             response_id = response.json().get("id")
-            print(f"[OK] Respuesta creada exitosamente para el reporte {report_id} con ID: {response_id}")
+            print(f"[OK] Respuesta creada exitosamente para el reporte {report_id}")
             return response_id
         else:
             print(f"[ERROR] Error al crear la respuesta: {response.status_code} -> {response.text}")
