@@ -36,10 +36,9 @@ Estas pruebas verifican endpoints y funcionalidades específicas que no forman p
 
 ## Descripción de los Archivos
 
-- `test_full_integration.py`: Contiene el script de prueba para el flujo de integración principal.
+- `test_login.py`: Contiene el script de prueba para el flujo de integración principal.
 - `generate_report.py`: Orquesta la ejecución de `test_full_integration.py` y genera el reporte PDF correspondiente.
 - `test_extended_functionality.py`: Contiene las pruebas para funcionalidades específicas y endpoints adicionales.
 - `generate_extended_report.py`: Orquesta la ejecución de `test_extended_functionality.py` y genera su reporte en PDF.
-- `test_password_change.py`: Un script de prueba aislado para la funcionalidad de cambio de contraseña.
 - `requirements.txt`: Lista las dependencias de Python necesarias para ejecutar las pruebas y generar los reportes.
 - `unal.png`: Logo utilizado en los reportes en PDF.
