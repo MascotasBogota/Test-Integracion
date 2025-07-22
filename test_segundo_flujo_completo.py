@@ -1,10 +1,6 @@
 from playwright.sync_api import sync_playwright
 import time
-import json
 import random
-import os
-
-RESPUESTAS_JSON = "respuestas_test.json"
 
 def generar_segundo_usuario():
     numero = random.randint(10000, 99999)
@@ -13,11 +9,6 @@ def generar_segundo_usuario():
         "password": "Test1234",
         "nombre": f"Segundo Usuario {numero}"
     }
-
-def guardar_respuestas(data):
-    with open(RESPUESTAS_JSON, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-    print(f"📝 IDs guardados en {os.path.abspath(RESPUESTAS_JSON)}")
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False, slow_mo=200)
@@ -59,8 +50,6 @@ with sync_playwright() as p:
     page.get_by_role("link", name="Avistamiento").click()
     page.wait_for_url("**/sighting/**", timeout=10000)
     page.get_by_placeholder("Escribe los detalles importantes").fill("Lo vi cerca del parque, parecía asustado.")
-    page.mouse.click(700, 500)
-    time.sleep(1)
     mapa = page.locator(".mapa")
     mapa.wait_for()
     box = mapa.bounding_box()
@@ -71,17 +60,10 @@ with sync_playwright() as p:
     print("✅ Avistamiento creado.")
     time.sleep(2)
 
-    # Guardar ID de respuesta desde URL
-    sighting_url = page.url
-    report_id = sighting_url.split("/reportes/")[-1]
-    sighting_id = "sighting_mock_id"  # puedes obtenerlo dinámicamente si la respuesta devuelve el ID
-
     print("📍 Creando hallazgo...")
     page.get_by_role("link", name="Encontrado").click()
     page.wait_for_url("**/found/**", timeout=10000)
     page.get_by_placeholder("Escribe los detalles importantes").fill("Lo encontré y lo tengo en casa, está a salvo.")
-    page.mouse.click(700, 500)
-    time.sleep(1)
     mapa = page.locator(".mapa")
     mapa.wait_for()
     box = mapa.bounding_box()
@@ -94,33 +76,25 @@ with sync_playwright() as p:
     print("✅ Hallazgo creado.")
     time.sleep(2)
 
-    found_id = "found_mock_id"  # si lo necesitas más adelante
-    
-    print("✏️ Editando avistamiento...")
-    page.goto(f"http://localhost:5173/sighting_edit/{report_id}/{sighting_id}")
-    page.get_by_placeholder("Describe lo que viste").fill("Actualización: lo vi cerca del parque anoche.")
-    page.get_by_role("button", name="Actualizar").click()
+    print("✏️ Editando avistamiento desde icono...")
+    page.locator("img[alt='pencil-response']").nth(0).click()
+    page.wait_for_url("**/sighting_edit/**", timeout=10000)
+    page.get_by_placeholder("Escribe los detalles importantes").fill("Actualización: lo vi cerca del parque anoche.")
+    page.get_by_role("button", name="Enviar").click()
     time.sleep(2)
     print("✅ Avistamiento actualizado.")
 
-    print("✏️ Editando hallazgo...")
-    page.goto(f"http://localhost:5173/found_edit/{report_id}/{found_id}")
-    page.get_by_placeholder("Describe el hallazgo").fill("Actualización: el perro está en el refugio de la 123.")
-    page.get_by_role("button", name="Actualizar").click()
+    print("✏️ Editando hallazgo desde icono...")
+    page.locator("img[alt='pencil-response']").nth(1).click()
+    page.wait_for_url("**/found_edit/**", timeout=10000)
+    page.get_by_placeholder("Escribe los detalles importantes").fill("Actualización: el perro está en el refugio de la 123.")
+    page.get_by_role("button", name="Enviar").click()
     time.sleep(2)
     print("✅ Hallazgo actualizado.")
-    
-    print("🗑️ Eliminando hallazgo...")
-    page.goto(f"http://localhost:5173/reportes/{report_id}")
-    time.sleep(2)
-    page.locator("img[alt='trash-response']").nth(1).click()  # asumiendo que el segundo trash es el hallazgo
-    time.sleep(10)
 
-    guardar_respuestas({
-        "report_id": report_id,
-        "sighting_id": sighting_id,
-        "found_id": found_id
-    })
+    print("🗑️ Eliminando hallazgo desde icono...")
+    page.locator("img[alt='trash-response']").nth(1).click()
+    time.sleep(3)
 
     print("🔚 Cerrando sesión...")
     page.get_by_test_id("navbar-logout-button").first.click()
